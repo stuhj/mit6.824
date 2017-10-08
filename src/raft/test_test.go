@@ -31,6 +31,7 @@ func TestInitialElection2A(t *testing.T) {
 
 	// does the leader+term stay the same if there is no network failure?
 	term1 := cfg.checkTerms()
+	fmt.Println("one passed")
 	time.Sleep(2 * RaftElectionTimeout)
 	term2 := cfg.checkTerms()
 	if term1 != term2 {
@@ -291,7 +292,7 @@ func TestRejoin2B(t *testing.T) {
 	fmt.Printf("Test (2B): rejoin of partitioned leader ...\n")
 
 	cfg.one(101, servers)
-
+	fmt.Println("!!")
 	// leader network failure
 	leader1 := cfg.checkOneLeader()
 	cfg.disconnect(leader1)
@@ -337,6 +338,7 @@ func TestBackup2B(t *testing.T) {
 	cfg.disconnect((leader1 + 4) % servers)
 
 	// submit lots of commands that won't commit
+	//fmt.Printf("leader1 is %v\n", leader1)
 	for i := 0; i < 50; i++ {
 		cfg.rafts[leader1].Start(rand.Int())
 	}
@@ -358,10 +360,13 @@ func TestBackup2B(t *testing.T) {
 
 	// now another partitioned leader and one follower
 	leader2 := cfg.checkOneLeader()
+
 	other := (leader1 + 2) % servers
 	if leader2 == other {
 		other = (leader2 + 1) % servers
 	}
+	//fmt.Printf("other partitation leader is %v\n", leader2)
+	//fmt.Printf("disconnect other %v\n", other)
 	cfg.disconnect(other)
 
 	// lots more commands that won't commit
